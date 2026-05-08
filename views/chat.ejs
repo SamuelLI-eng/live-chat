@@ -1,31 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Chat</title>
     <link rel="stylesheet" href="css/chat.css">
 </head>
+
 <body>
-<div class="chat-page">
-<div class="chat-history">
-    <% for (const his of chat.history) { %>
-        <div><%= his %></div>
-        <% } %>
-</div>
-<div class="chat-form">
-    <input type="text">
-<button>Send</button>
-</div>
-</div>
-<script>
-    document.addEventListener('DOMContentLoaded', () =>{
-        setInterval(() => {
-            fetch('/poll', {
-                method: 'GET'
-            });
-        },2000);
-    });
+    <div class="chat-page">
+        <div class="chat-history">
+            <% for (const his of chat.history) { %>
+            <div>
+                <%= his %>
+            </div>
+            <% } %>
+        </div>
+        <div class="chat-form">
+            <form action = "" id ="sendMessageForm">
+                <input type="text">
+                <button>Send</button>
+            </form>
+
+        </div>
+    </div>
+    <script>
+    function sendMessage() {
+        const messageContent = document.getElementById('messageBox').value;
+        if (messageContent.trim() === ''){
+            return;
+        }
+        fetch('/send', {
+           method: 'POST',
+           headers: {
+            'Content-Type': 'application/json'
+           },
+           body:JSON.stringify({messageContent})
+        });
+
+    }
+    async function poll() {
+        const response = await fetch('/poll');
+        const data = await response.json();
+        console.log(data);
+        setTimeout(poll,2000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        poll();
+        document.getElementById('sendMessageForm').addEventListener('submit', e => {
+            e.preventDefault();
+            sendMessage();
+        });
+    })
+
+
+
 </script>
 </body>
 </html>
