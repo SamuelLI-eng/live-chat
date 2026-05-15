@@ -23,20 +23,31 @@ const chat = {
 app.post('/join', (req,res) => {
    const nickname = req.body.nickname;
    chat.users.push(nickname);
-   chat.history.push(`Welcome ${nickname} to join the chat`);
-   res.render('chat', { chat: chat });
+   chat.history.push({
+    nickname: 'System',
+    message: `Welcome ${nickname} to join the chat.`,
+    datetime: new Date()
+   });
+   res.render('chat', { chat, nickname });
 });
 
 app.get('/poll', (req, res) => {
     res.send(JSON.stringify(chat));
-})
+});
 
 app.post('/send', (req, res) => {
     const msg =req.body.messageContent;
+    const nickname = req.body.nickname;
+    console.log(msg, '', nickname);
     console.log(msg);
+    chat.history.push({
+    nickname: 'System',
+    message: msg,
+    datetime: new Date()
+   });
     res.send('OK');
-})
+});
 
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
-});
+})
