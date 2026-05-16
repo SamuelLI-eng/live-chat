@@ -41,7 +41,7 @@ app.post('/send', (req, res) => {
     console.log(msg, '', nickname);
     console.log(msg);
     chat.history.push({
-    nickname: 'System',
+    nickname: nickname,
     message: msg,
     datetime: new Date()
    });
