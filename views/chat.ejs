@@ -14,7 +14,7 @@
         </div>
         <div class="chat-form">
             <form action="" id="sendMessageForm">
-                <input type="text" id="messageBox">
+                <input type="text" id="messageBox" autocomplete="off">
                 <button>Send</button>
             </form>
 
@@ -49,7 +49,7 @@
             const chatHisElem = document.getElementById('chatHistory');
             if (data.history.length > 0) {
                 chatHisElem.innerHTML += data.history
-                .map(his => `<p class="${getClassNameByNickname(his.nickname)}">${his.nickname}: ${his.message}</p>`)
+                .map(his => `<p class="${getClassNameByNickname(his.nickname)}"><span class="message-datetime">${displayedDateTime(new Date(his.datetime))}</span><br> ${his.nickname}: ${his.message}</p>`)
                 .join('');
                 lastMessageId = data.history[data.history.length-1].id;
             }
@@ -58,7 +58,7 @@
             }
 
 
-            setTimeout(poll, 10000);
+            setTimeout(poll, 400);
         }
 
         function getClassNameByNickname(theNickname) {
@@ -83,7 +83,25 @@
                 const scrollBottom = chatHisElem.scrollHeight - chatHisElem.scrollTop - chatHisElem.clientHeight;
                 autoScroll = scrollBottom < 5;
             });
-        })
+        });
+
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        function displayedDateTime(dateTime) {
+            const nowDate = new Date();
+            const now = nowDate.getTime();
+            if (now-dateTime.getTime() < 60000) {
+                return  'Now';
+            }
+            if (now - dateTime.getTime() < 360000) {
+                return `${Math.round((now-dateTime.getTime())/60000)} minutes ago`;
+            }
+            if (nowDate.getFullYear() === dateTime.getFullYear()
+                && nowDate.getMonth() === dateTime.getMonth()
+                && nowDate.getDate() === dateTime.getDate()) {
+                    return `${dateTime.getHours()}:${dateTime.getMinutes()}`;
+            }
+            return `${dateTime.getDate()}/${month[dateTime.getMonth()]} ${dateTime.getHours()}:${dateTime.getMinutes()}`
+        }
 
 
 
