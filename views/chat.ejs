@@ -14,7 +14,7 @@
         </div>
         <div class="chat-form">
             <form action="" id="sendMessageForm">
-                <input type="text" id="messageBox" autocomplete="off">
+                <input type="text" id="messageBox" autocomplete="off" autofocus>
                 <button>Send</button>
             </form>
 
@@ -41,21 +41,25 @@
             document.getElementById('messageBox').value = '';
         }
         async function poll() {
-            const response = await fetch('/poll?lastMessageId=' + lastMessageId);
-            const data = await response.json();
-            console.log(data);
+            try {
+                const response = await fetch('/poll?lastMessageId=' + lastMessageId);
+                const data = await response.json();
+             
+                
+                const chatHisElem = document.getElementById('chatHistory');
+                if (data.history.length > 0) {
+                    chatHisElem.innerHTML += data.history
+                    .map(his => `<p class="${getClassNameByNickname(his.nickname)}"><span class="message-datetime" data-ts="${his.datetime}">${displayedDateTime(new Date(his.datetime))}</span><br> ${his.nickname}: ${his.message}</p>`)
+                    .join('');
+                    lastMessageId = data.history[data.history.length-1].id;
+                }
+                if (autoScroll) {
+                    chatHisElem.scrollTop = chatHisElem.scrollHeight;
+                }
+            } catch (error) {
+                console.error(error);
+            }
 
-            
-            const chatHisElem = document.getElementById('chatHistory');
-            if (data.history.length > 0) {
-                chatHisElem.innerHTML += data.history
-                .map(his => `<p class="${getClassNameByNickname(his.nickname)}"><span class="message-datetime">${displayedDateTime(new Date(his.datetime))}</span><br> ${his.nickname}: ${his.message}</p>`)
-                .join('');
-                lastMessageId = data.history[data.history.length-1].id;
-            }
-            if (autoScroll) {
-                chatHisElem.scrollTop = chatHisElem.scrollHeight;
-            }
 
 
             setTimeout(poll, 400);
@@ -83,7 +87,19 @@
                 const scrollBottom = chatHisElem.scrollHeight - chatHisElem.scrollTop - chatHisElem.clientHeight;
                 autoScroll = scrollBottom < 5;
             });
+
+            updateDateTime();
         });
+
+        function updateDateTime() {
+            const dateTimeSpans = document.getElementById('chatHistory').querySelectorAll('span.message-datetime')
+            dateTimeSpans.forEach(dateTimeSpan => {
+                const timestamp = dateTimeSpan.dataset['ts'];
+                const dateTimeString = displayedDateTime(new Date(timestamp));
+                dateTimeSpan.innerHTML = dateTimeString;
+            });
+            setTimeout(updateDateTime, 30000);
+        }
 
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         function displayedDateTime(dateTime) {
@@ -93,10 +109,15 @@
                 return  'Now';
             }
             if (now - dateTime.getTime() < 360000) {
-                return `${Math.round((now-dateTime.getTime())/60000)} minutes ago`;
+                const minutes = Math.round((now-dateTime.getTime())/60000);
+                if (minutes > 1) {
+                    return `${minutes} minutes ago`;
+                } else {
+                    return `${minutes} minute ago`;
+                }
             }
             if (nowDate.getFullYear() === dateTime.getFullYear()
-                && nowDate.getMonth() === dateTime.getMonth()
+                && nowDate.getMonths() === dateTime.getMonths()
                 && nowDate.getDate() === dateTime.getDate()) {
                     return `${dateTime.getHours()}:${dateTime.getMinutes()}`;
             }

@@ -12,5 +12,7 @@ $ node index.js
 
 ### issue tracking
 - (done) `/poll` returns only new messages.
-- display message date time.
+- (done) display message date time.
+- (done) every 30 seconds we update all the date time.
 - the frontend should recover from server restart
+- persist chat history
