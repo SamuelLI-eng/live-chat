@@ -39,7 +39,10 @@
 
 
             document.getElementById('messageBox').value = '';
+
         }
+
+        let pollInterval = 400;
         async function poll() {
             try {
                 const response = await fetch('/poll?lastMessageId=' + lastMessageId);
@@ -58,11 +61,10 @@
                 }
             } catch (error) {
                 console.error(error);
+                pollInterval = math.min(pollInterval * 2, 30000);
             }
 
-
-
-            setTimeout(poll, 400);
+            setTimeout(poll, pollInterval);
         }
 
         function getClassNameByNickname(theNickname) {

@@ -18,5 +18,27 @@
         </div>
         
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const nickname = document.getElementById('nickname').value;
+                if (nickname.trim() === '') {
+                    return;
+                }
+                if (await nicknameExists(nickname)) {
+                    alert('Duplicate nickname, try another one.');
+                }
+                e.target.submit();
+            })
+        });
+
+        async function nicknameExists(nickname) {
+            //fetch server /nickname/exists
+            //get response data
+            //return true or false
+        }
+    </script>
 </body>
 </html>
